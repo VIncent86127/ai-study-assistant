@@ -1,0 +1,77 @@
+<view class="container">
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{subjectFilter}}" bindchange="onSubjectFilter" value="{{subjectFilterIndex}}">
+      <view class="filter-item">
+        <text>{{subjectFilter[subjectFilterIndex]}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+    <picker mode="selector" range="{{statusFilter}}" bindchange="onStatusFilter" value="{{statusFilterIndex}}">
+      <view class="filter-item">
+        <text>{{statusFilter[statusFilterIndex]}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-num">{{totalCount}}</text>
+      <text class="stat-label">总错题</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-num">{{pendingCount}}</text>
+      <text class="stat-label">待复习</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-num">{{masteredCount}}</text>
+      <text class="stat-label">已掌握</text>
+    </view>
+  </view>
+
+  <!-- 错题列表 -->
+  <view class="mistake-list" wx:if="{{mistakes.length > 0}}">
+    <view class="mistake-card" wx:for="{{mistakes}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="card-header">
+        <view class="subject-tag">{{item.subject_name}}</view>
+        <view class="status-tag status-{{item.status}}">
+          {{item.status === 'pending' ? '待复习' : item.status === 'mastered' ? '已掌握' : '已删除'}}
+        </view>
+      </view>
+      
+      <view class="card-content">
+        <text class="question-preview">{{item.question_text}}</text>
+      </view>
+      
+      <view class="card-footer">
+        <text class="chapter-name" wx:if="{{item.chapter_name}}">{{item.chapter_name}}</text>
+        <text class="create-time">{{item.created_at}}</text>
+      </view>
+      
+      <view class="card-meta" wx:if="{{item.mistake_type || item.difficulty}}">
+        <text class="meta-item" wx:if="{{item.mistake_type}}">{{item.mistake_type}}</text>
+        <text class="meta-item" wx:if="{{item.difficulty}}">{{item.difficulty}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{mistakes.length === 0 && !loading}}">
+    <image class="empty-icon" src="/assets/icons/empty.png" mode="aspectFit"></image>
+    <text class="empty-text">还没有错题</text>
+    <button class="add-btn" bindtap="goToAdd">添加错题</button>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{hasMore && mistakes.length > 0}}">
+    <text wx:if="{{loading}}">加载中...</text>
+    <text wx:else bindtap="loadMore">加载更多</text>
+  </view>
+
+  <!-- 悬浮添加按钮 -->
+  <view class="float-add-btn" bindtap="goToAdd">
+    <text class="add-icon">+</text>
+  </view>
+</view>

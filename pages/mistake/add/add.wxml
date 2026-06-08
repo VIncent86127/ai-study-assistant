@@ -1,0 +1,119 @@
+<view class="container">
+  <!-- 拍照区域 -->
+  <view class="camera-section">
+    <view class="camera-box" bindtap="chooseImage" wx:if="{{!imagePath}}">
+      <image class="camera-icon" src="/assets/icons/camera.png" mode="aspectFit"></image>
+      <text class="camera-text">点击拍照或上传图片</text>
+    </view>
+    <view class="image-preview" wx:if="{{imagePath}}">
+      <image class="preview-img" src="{{imagePath}}" mode="aspectFit" bindtap="previewImage"></image>
+      <view class="image-actions">
+        <button class="action-btn" bindtap="chooseImage" size="mini">重拍</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 识别结果 -->
+  <view class="result-section" wx:if="{{recognizedText}}">
+    <view class="section-title">
+      <text>题目识别结果</text>
+      <text class="edit-btn" bindtap="editQuestionText">编辑</text>
+    </view>
+    <view class="question-content">
+      <textarea class="question-textarea" 
+                value="{{questionText}}" 
+                bindinput="onQuestionInput"
+                placeholder="题目内容..."
+                auto-height />
+    </view>
+  </view>
+
+  <!-- 学科选择 -->
+  <view class="form-section">
+    <view class="form-item">
+      <text class="form-label">学科</text>
+      <picker mode="selector" range="{{subjects}}" bindchange="onSubjectChange" value="{{subjectIndex}}">
+        <view class="picker-value">{{subjects[subjectIndex] || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="form-label">年级</text>
+      <picker mode="selector" range="{{grades}}" bindchange="onGradeChange" value="{{gradeIndex}}">
+        <view class="picker-value">{{grades[gradeIndex] || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="form-label">题目类型</text>
+      <picker mode="selector" range="{{questionTypes}}" bindchange="onTypeChange" value="{{typeIndex}}">
+        <view class="picker-value">{{questionTypes[typeIndex] || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="form-label">难度</text>
+      <picker mode="selector" range="{{difficulties}}" bindchange="onDifficultyChange" value="{{difficultyIndex}}">
+        <view class="picker-value">{{difficulties[difficultyIndex] || '请选择'}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 正确答案 -->
+  <view class="answer-section">
+    <view class="section-title">正确答案</view>
+    <textarea class="answer-textarea" 
+              value="{{correctAnswer}}" 
+              bindinput="onAnswerInput"
+              placeholder="请输入正确答案..."
+              auto-height />
+  </view>
+
+  <!-- 关联知识点 -->
+  <view class="knowledge-section" wx:if="{{knowledgePoints.length > 0}}">
+    <view class="section-title">关联知识点</view>
+    <view class="knowledge-list">
+      <view class="knowledge-item" wx:for="{{knowledgePoints}}" wx:key="id">
+        <view class="knowledge-tag">{{item.type === 'phrase' ? '短语' : item.type === 'pattern' ? '句型' : '语法'}}</view>
+        <text class="knowledge-content">{{item.content}}</text>
+        <text class="knowledge-chapter">{{item.chapter}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生僻词解析 -->
+  <view class="vocab-section" wx:if="{{vocabulary.length > 0}}">
+    <view class="section-title">生僻词解析</view>
+    <view class="vocab-list">
+      <view class="vocab-item" wx:for="{{vocabulary}}" wx:key="word">
+        <view class="vocab-word">
+          <text class="word-text">{{item.word}}</text>
+          <text class="word-phonetic">{{item.phonetic}}</text>
+        </view>
+        <text class="vocab-meaning">{{item.meaning || '待补充'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户备注 -->
+  <view class="note-section">
+    <view class="section-title">
+      <text>我的思路/备注</text>
+    </view>
+    <view class="note-input-area">
+      <textarea class="note-textarea" 
+                value="{{noteContent}}" 
+                bindinput="onNoteInput"
+                placeholder="记录当时的想法、思路或错误原因..."
+                auto-height />
+    </view>
+    <view class="voice-input-btn" bindtap="startVoiceRecord">
+      <image class="voice-icon" src="/assets/icons/mic.png" mode="aspectFit"></image>
+      <text>语音输入</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="submitMistake" disabled="{{!canSubmit}}">
+      保存错题
+    </button>
+  </view>
+</view>

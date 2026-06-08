@@ -2,10 +2,11 @@
 App({
   globalData: {
     // 后端API地址
-    apiBaseUrl: 'https://api.study-assistant.example.com',
+    apiBase: 'http://localhost:5001',
     
     // 用户信息
     userInfo: null,
+    userId: 'default',
     
     // 学习进度缓存
     studyProgress: null,

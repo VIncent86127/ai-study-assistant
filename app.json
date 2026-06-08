@@ -5,7 +5,10 @@
     "pages/chat/chat",
     "pages/homework/homework",
     "pages/progress/progress",
-    "pages/subject/subject"
+    "pages/subject/subject",
+    "pages/mistake/list/list",
+    "pages/mistake/add/add",
+    "pages/mistake/detail/detail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#1a1a2e",
@@ -43,6 +46,12 @@
         "text": "进度",
         "iconPath": "images/progress.png",
         "selectedIconPath": "images/progress-active.png"
+      },
+      {
+        "pagePath": "pages/mistake/list/list",
+        "text": "错题",
+        "iconPath": "images/mistake.png",
+        "selectedIconPath": "images/mistake-active.png"
       }
     ]
   },

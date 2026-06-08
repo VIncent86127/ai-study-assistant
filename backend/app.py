@@ -11,8 +11,14 @@ import os
 import json
 from datetime import datetime
 
+# 导入错题集路由
+from mistake_routes import mistake_bp
+
 app = Flask(__name__)
 CORS(app)
+
+# 注册蓝图
+app.register_blueprint(mistake_bp)
 
 # 配置
 app.config['JSON_AS_ASCII'] = False
