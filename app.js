@@ -6,7 +6,7 @@ App({
     
     // 用户信息
     userInfo: null,
-    userId: 'default',
+    userId: 'test_user',  // 测试用户ID
     
     // 学习进度缓存
     studyProgress: null,
