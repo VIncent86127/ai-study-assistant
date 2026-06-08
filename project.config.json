@@ -29,7 +29,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "2.19.4",
-  "appid": "请填写你的AppID",
+  "appid": "wx1234567890abcdef",
   "projectname": "ai-study-assistant",
   "condition": {}
 }
