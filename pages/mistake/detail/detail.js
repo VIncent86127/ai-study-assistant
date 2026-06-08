@@ -7,7 +7,8 @@ const AI_MODELS = {
   claude: { name: 'Claude', endpoint: '/api/ai/claude' },
   glm: { name: '智谱GLM', endpoint: '/api/ai/glm' },
   qwen: { name: '通义千问', endpoint: '/api/ai/qwen' },
-  deepseek: { name: 'DeepSeek V4', endpoint: '/api/ai/deepseek' }
+  deepseek: { name: 'DeepSeek V4', endpoint: '/api/ai/deepseek' },
+  openmaic: { name: 'OpenMAIC', endpoint: '/api/ai/openmaic' }
 }
 
 Page({

@@ -593,6 +593,10 @@ def generate_similar_question():
         'qwen': {
             'question': f"[通义千问生成] 针对知识点【{knowledge_points}】的练习：\n翻译句子：\n他昨天去了公园。",
             'answer': 'He went to the park yesterday.（yesterday是过去时间，go变成went）'
+        },
+        'openmaic': {
+            'question': f"[OpenMAIC生成] 根据知识点【{knowledge_points}】设计练习题：\n单项选择：\nMy father _____ to work by car every day.\nA. go  B. goes  C. going  D. went",
+            'answer': 'B. goes（every day表示每天，用一般现在时，第三人称单数加s）'
         }
     }
     

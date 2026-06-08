@@ -137,6 +137,7 @@
         <view class="model-btn {{currentModel === 'glm' ? 'active' : ''}}" bindtap="selectModel" data-model="glm">GLM</view>
         <view class="model-btn {{currentModel === 'qwen' ? 'active' : ''}}" bindtap="selectModel" data-model="qwen">通义</view>
         <view class="model-btn {{currentModel === 'deepseek' ? 'active' : ''}}" bindtap="selectModel" data-model="deepseek">DeepSeek</view>
+        <view class="model-btn {{currentModel === 'openmaic' ? 'active' : ''}}" bindtap="selectModel" data-model="openmaic">OpenMAIC</view>
       </view>
     </view>
     
