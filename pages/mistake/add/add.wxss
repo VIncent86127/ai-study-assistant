@@ -127,6 +127,31 @@
   color: #666;
 }
 
+.picker-value-fixed {
+  font-size: 28rpx;
+  color: #007aff;
+  font-weight: 500;
+}
+
+/* 星级显示 */
+.stars-picker {
+  display: flex;
+  align-items: center;
+}
+
+.stars-display {
+  color: #ff9500;
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+  font-weight: bold;
+}
+
+.stars-text {
+  color: #666;
+  font-size: 24rpx;
+  margin-left: 10rpx;
+}
+
 /* 知识点 */
 .knowledge-section,
 .vocab-section {

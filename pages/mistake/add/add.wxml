@@ -28,13 +28,11 @@
     </view>
   </view>
 
-  <!-- 学科选择 -->
+  <!-- 学科选择（固定英语） -->
   <view class="form-section">
     <view class="form-item">
       <text class="form-label">学科</text>
-      <picker mode="selector" range="{{subjects}}" bindchange="onSubjectChange" value="{{subjectIndex}}">
-        <view class="picker-value">{{subjects[subjectIndex] || '请选择'}}</view>
-      </picker>
+      <view class="picker-value-fixed">英语</view>
     </view>
     <view class="form-item">
       <text class="form-label">年级</text>
@@ -50,8 +48,10 @@
     </view>
     <view class="form-item">
       <text class="form-label">难度</text>
-      <picker mode="selector" range="{{difficulties}}" bindchange="onDifficultyChange" value="{{difficultyIndex}}">
-        <view class="picker-value">{{difficulties[difficultyIndex] || '请选择'}}</view>
+      <picker mode="selector" range="{{difficultyLabels}}" bindchange="onDifficultyChange" value="{{difficultyIndex}}">
+        <view class="picker-value stars-picker">
+          <text class="stars-display">{{difficultyStars}}</text>
+        </view>
       </picker>
     </view>
   </view>

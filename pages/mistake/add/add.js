@@ -9,20 +9,27 @@ Page({
     correctAnswer: '',
     noteContent: '',
     
-    subjects: ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'],
-    subjectIndex: -1,
-    subjectId: null,
+    // 学科固定为英语
+    subjects: ['英语'],
+    subjectIndex: 0,
+    subjectId: 3, // 英语的学科ID
+    subjectName: '英语',
     
-    grades: ['初一', '初二', '初三'],
+    // 年级增加中考
+    grades: ['初一', '初二', '初三', '中考'],
     gradeIndex: -1,
     gradeId: null,
     
-    questionTypes: ['选择题', '填空题', '简答题', '计算题', '阅读理解', '作文'],
+    // 英语中考题型
+    questionTypes: ['听力理解', '单项选择', '完形填空', '阅读理解', '词汇运用', '语法填空', '任务型阅读', '书面表达', '翻译', '其他'],
     typeIndex: -1,
     mistakeType: '',
     
-    difficulties: ['简单', '中等', '困难'],
-    difficultyIndex: 1,
+    // 难度星级：0.5-5星，共10级
+    difficultyLabels: ['半星', '1星', '1.5星', '2星', '2.5星', '3星', '3.5星', '4星', '4.5星', '5星'],
+    difficultyLevels: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+    difficultyIndex: 2, // 默认1.5星
+    difficultyStars: '★☆',
     
     knowledgePoints: [],
     vocabulary: [],
@@ -31,6 +38,11 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化难度星级显示
+    this.setData({
+      difficultyStars: this.generateStars(this.data.difficultyLevels[this.data.difficultyIndex])
+    })
+    
     // 如果有传入图片路径
     if (options.imagePath) {
       this.setData({ imagePath: options.imagePath })
@@ -141,55 +153,59 @@ Page({
     this.setData({ noteContent: e.detail.value })
   },
 
-  // 学科选择
-  onSubjectChange(e) {
-    const index = parseInt(e.detail.value)
-    const subjectName = this.data.subjects[index]
-    
-    // 获取学科ID
-    wx.request({
-      url: app.globalData.apiBase + '/api/subjects/list',
-      success: (res) => {
-        // 简化处理，假设按顺序
-        this.setData({
-          subjectIndex: index,
-          subjectId: index + 1  // 实际应该从API获取
-        })
-        
-        // 如果已有题目文本，重新分析
-        if (this.data.questionText) {
-          this.analyzeQuestion()
-        }
-      }
-    })
-  },
-
   // 年级选择
   onGradeChange(e) {
     const index = parseInt(e.detail.value)
+    const gradeMap = {0: 1, 1: 2, 2: 3, 3: 4} // 初一=1, 初二=2, 初三=3, 中考=4
     this.setData({
       gradeIndex: index,
-      gradeId: index + 1  // 实际应该从API获取
+      gradeId: gradeMap[index]
     })
   },
 
   // 类型选择
   onTypeChange(e) {
     const index = parseInt(e.detail.value)
-    const types = ['choice', 'blank', 'short', 'calculation', 'reading', 'composition']
+    const typeMap = {
+      '听力理解': 'listening',
+      '单项选择': 'choice',
+      '完形填空': 'cloze',
+      '阅读理解': 'reading',
+      '词汇运用': 'vocabulary',
+      '语法填空': 'grammar_blank',
+      '任务型阅读': 'task_reading',
+      '书面表达': 'writing',
+      '翻译': 'translation',
+      '其他': 'other'
+    }
     this.setData({
       typeIndex: index,
-      mistakeType: types[index]
+      mistakeType: typeMap[this.data.questionTypes[index]]
     })
   },
 
-  // 难度选择
+  // 难度选择（星级）
   onDifficultyChange(e) {
     const index = parseInt(e.detail.value)
-    const diffMap = ['easy', 'medium', 'hard']
+    const level = this.data.difficultyLevels[index]
+    const stars = this.generateStars(level)
     this.setData({
-      difficultyIndex: index
+      difficultyIndex: index,
+      difficultyStars: stars,
+      difficultyLevel: level
     })
+  },
+  
+  // 生成星级显示
+  generateStars(level) {
+    const fullStars = Math.floor(level)
+    const hasHalf = level % 1 !== 0
+    let stars = '★'.repeat(fullStars)
+    if (hasHalf) stars += '⯨' // 半星符号
+    // 补齐空星
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0)
+    stars += '☆'.repeat(emptyStars)
+    return stars
   },
 
   // 检查是否可以提交
@@ -252,7 +268,7 @@ Page({
       question_text: this.data.questionText,
       correct_answer: this.data.correctAnswer,
       mistake_type: this.data.mistakeType || 'unknown',
-      difficulty: ['easy', 'medium', 'hard'][this.data.difficultyIndex],
+      difficulty: this.data.difficultyLevels[this.data.difficultyIndex], // 星级数值
       knowledge_points: this.data.knowledgePoints.map(kp => ({
         type: kp.type,
         id: kp.id
