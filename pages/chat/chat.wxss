@@ -1,0 +1,222 @@
+/* pages/chat/chat.wxss */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+/* 消息列表 */
+.message-list {
+  flex: 1;
+  padding: 20rpx;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.message-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.user-message .message-avatar {
+  background: var(--gold-primary);
+  margin-left: 16rpx;
+}
+
+.ai-message .message-avatar {
+  background: linear-gradient(135deg, #2a2a4a 0%, #3a3a5a 100%);
+  margin-right: 16rpx;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.user-message .message-content {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+  color: var(--bg-primary);
+  border-bottom-right-radius: 4rpx;
+}
+
+.ai-message .message-content {
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-gold);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4rpx;
+}
+
+.ai-text {
+  white-space: pre-wrap;
+}
+
+.message-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--border-gold);
+}
+
+.action-btn {
+  font-size: 24rpx;
+  color: var(--gold-primary);
+  padding: 8rpx 20rpx;
+  border: 1rpx solid var(--gold-dark);
+  border-radius: 4rpx;
+}
+
+/* 正在输入 */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+}
+
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  background: var(--gold-primary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+/* 学科选择栏 */
+.subject-bar {
+  padding: 16rpx 20rpx;
+  background: var(--bg-secondary);
+  border-top: 1rpx solid var(--border-gold);
+}
+
+.picker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subject-label {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.subject-value {
+  font-size: 28rpx;
+  color: var(--gold-primary);
+  font-weight: bold;
+  margin: 0 8rpx;
+}
+
+.picker-arrow {
+  font-size: 20rpx;
+  color: var(--gold-dark);
+}
+
+/* 输入区域 */
+.input-area {
+  display: flex;
+  align-items: flex-end;
+  padding: 16rpx 20rpx;
+  background: var(--bg-secondary);
+  border-top: 1rpx solid var(--border-gold);
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+}
+
+.input-box {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 24rpx;
+  padding: 12rpx 20rpx;
+  margin-right: 16rpx;
+}
+
+.input-box textarea {
+  width: 100%;
+  min-height: 48rpx;
+  max-height: 200rpx;
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+.input-placeholder {
+  color: var(--text-muted);
+}
+
+.send-btn {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+  color: var(--bg-primary);
+  padding: 16rpx 32rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  letter-spacing: 2rpx;
+}
+
+/* 快捷问题 */
+.quick-questions {
+  padding: 20rpx;
+  background: var(--bg-secondary);
+  border-top: 1rpx solid var(--border-gold);
+}
+
+.quick-title {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  margin-bottom: 16rpx;
+}
+
+.quick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.quick-item {
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 8rpx;
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+  color: var(--gold-primary);
+}

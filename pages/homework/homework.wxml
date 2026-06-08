@@ -1,0 +1,78 @@
+<!--pages/homework/homework.wxml - 作业辅导页面-->
+<view class="container">
+  <view class="banner">
+    <view class="banner-title">作业辅导</view>
+    <view class="banner-desc">拍照上传 · AI智能批改 · 详细解析</view>
+  </view>
+
+  <!-- 上传区域 -->
+  <view class="upload-area" bindtap="chooseImage">
+    <view class="upload-icon" wx:if="{{!imagePath}}">📷</view>
+    <view class="upload-text" wx:if="{{!imagePath}}">点击拍照上传作业</view>
+    <image class="preview-image" src="{{imagePath}}" mode="aspectFit" wx:if="{{imagePath}}"></image>
+    <view class="reupload-btn" wx:if="{{imagePath}}" bindtap="chooseImage">重新上传</view>
+  </view>
+
+  <!-- 学科选择 -->
+  <view class="card">
+    <view class="card-title">选择学科</view>
+    <view class="subject-list">
+      <view class="subject-tag {{currentSubject === item ? 'active' : ''}}" 
+            wx:for="{{subjects}}" wx:key="*this" 
+            bindtap="selectSubject" 
+            data-subject="{{item}}">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 分析结果 -->
+  <view class="card" wx:if="{{analysisResult}}">
+    <view class="card-title">分析结果</view>
+    <view class="result-section">
+      <view class="result-item">
+        <view class="result-label">题目类型</view>
+        <view class="result-value">{{analysisResult.questionType}}</view>
+      </view>
+      <view class="result-item">
+        <view class="result-label">难度等级</view>
+        <view class="result-value">{{analysisResult.difficulty}}</view>
+      </view>
+      <view class="result-item">
+        <view class="result-label">涉及知识点</view>
+        <view class="result-value">{{analysisResult.knowledgePoints}}</view>
+      </view>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="solution-section">
+      <view class="section-title">解题思路</view>
+      <view class="solution-content">{{analysisResult.solution}}</view>
+    </view>
+
+    <view class="answer-section">
+      <view class="section-title">参考答案</view>
+      <view class="answer-content">{{analysisResult.answer}}</view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="card">
+    <view class="card-title">最近作业</view>
+    <view class="history-list" wx:if="{{homeworkHistory.length > 0}}">
+      <view class="history-item" wx:for="{{homeworkHistory}}" wx:key="id" bindtap="viewHistory" data-id="{{item.id}}">
+        <view class="history-subject">{{item.subject}}</view>
+        <view class="history-info">
+          <view class="history-title">{{item.title}}</view>
+          <view class="history-time">{{item.time}}</view>
+        </view>
+        <view class="history-arrow">→</view>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">暂无作业记录</view>
+    </view>
+  </view>
+</view>

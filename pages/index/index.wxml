@@ -1,0 +1,106 @@
+<!--pages/index/index.wxml - AI学习助手首页-->
+<view class="container">
+  <!-- 欢迎横幅 -->
+  <view class="banner">
+    <view class="banner-title">AI学习助手</view>
+    <view class="banner-desc">智能辅导 · 轻松学习 · 进步看得见</view>
+  </view>
+
+  <!-- 用户信息卡片 -->
+  <view class="user-card" wx:if="{{userInfo}}">
+    <view class="user-avatar">{{userInfo.nickname || '同学'}}</view>
+    <view class="user-info">
+      <view class="user-name">{{userInfo.nickname || '同学'}}</view>
+      <view class="user-grade">{{userInfo.grade || '请选择年级'}}</view>
+    </view>
+    <view class="study-stats">
+      <view class="stats-item">
+        <view class="stats-value">{{todayQuestions}}</view>
+        <view class="stats-label">今日问答</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-value">{{totalQuestions}}</view>
+        <view class="stats-label">累计问答</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="login-tip" wx:else bindtap="goToLogin">
+    <view class="tip-icon">👋</view>
+    <view class="tip-text">点击登录，开始你的AI学习之旅</view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-entry">
+    <view class="entry-item" bindtap="goToChat">
+      <view class="entry-icon">🤖</view>
+      <view class="entry-text">AI问答</view>
+    </view>
+    <view class="entry-item" bindtap="goToHomework">
+      <view class="entry-icon">📝</view>
+      <view class="entry-text">作业辅导</view>
+    </view>
+    <view class="entry-item" bindtap="goToProgress">
+      <view class="entry-icon">📊</view>
+      <view class="entry-text">学习进度</view>
+    </view>
+    <view class="entry-item" bindtap="goToSubject">
+      <view class="entry-icon">📚</view>
+      <view class="entry-text">学科专项</view>
+    </view>
+  </view>
+
+  <!-- 学科选择 -->
+  <view class="card">
+    <view class="card-title">🎯 选择学科</view>
+    <view class="subject-grid">
+      <view class="subject-item" wx:for="{{subjects}}" wx:key="*this" bindtap="selectSubject" data-subject="{{item}}">
+        <view class="subject-icon">{{subjectIcons[item] || '📖'}}</view>
+        <view class="subject-name">{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日推荐 -->
+  <view class="card">
+    <view class="card-title">💡 今日推荐</view>
+    <view class="recommend-list">
+      <view class="recommend-item" wx:for="{{recommendations}}" wx:key="id" bindtap="goToQuestion" data-question="{{item}}">
+        <view class="recommend-icon">{{item.icon}}</view>
+        <view class="recommend-content">
+          <view class="recommend-title">{{item.title}}</view>
+          <view class="recommend-desc">{{item.desc}}</view>
+        </view>
+        <view class="recommend-arrow">→</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习统计 -->
+  <view class="card" wx:if="{{userInfo}}">
+    <view class="card-title">📈 学习统计</view>
+    <view class="stats-grid">
+      <view class="stats-row">
+        <view class="stats-cell">
+          <view class="stats-value">{{weeklyQuestions}}</view>
+          <view class="stats-label">本周问答</view>
+        </view>
+        <view class="stats-cell">
+          <view class="stats-value">{{masteredPoints}}</view>
+          <view class="stats-label">掌握知识点</view>
+        </view>
+      </view>
+      <view class="stats-row">
+        <view class="stats-cell">
+          <view class="stats-value">{{studyDays}}</view>
+          <view class="stats-label">学习天数</view>
+        </view>
+        <view class="stats-cell">
+          <view class="stats-value">{{accuracyRate}}%</view>
+          <view class="stats-label">正确率</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

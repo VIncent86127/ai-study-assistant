@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/chat/chat",
+    "pages/homework/homework",
+    "pages/progress/progress",
+    "pages/subject/subject"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#1a1a2e",
+    "navigationBarTitleText": "AI学习助手",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0d0d1a",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#a0a0a0",
+    "selectedColor": "#c9a227",
+    "backgroundColor": "#1a1a2e",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/chat/chat",
+        "text": "AI问答",
+        "iconPath": "images/chat.png",
+        "selectedIconPath": "images/chat-active.png"
+      },
+      {
+        "pagePath": "pages/homework/homework",
+        "text": "作业",
+        "iconPath": "images/homework.png",
+        "selectedIconPath": "images/homework-active.png"
+      },
+      {
+        "pagePath": "pages/progress/progress",
+        "text": "进度",
+        "iconPath": "images/progress.png",
+        "selectedIconPath": "images/progress-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

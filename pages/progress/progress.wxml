@@ -1,0 +1,69 @@
+<!--pages/progress/progress.wxml - 学习进度页面-->
+<view class="container">
+  <view class="banner">
+    <view class="banner-title">学习进度</view>
+    <view class="banner-desc">记录成长 · 追踪进步 · 数据驱动</view>
+  </view>
+
+  <!-- 总览统计 -->
+  <view class="overview-card">
+    <view class="overview-item">
+      <view class="overview-value">{{totalQuestions}}</view>
+      <view class="overview-label">累计问答</view>
+    </view>
+    <view class="overview-item">
+      <view class="overview-value">{{studyDays}}</view>
+      <view class="overview-label">学习天数</view>
+    </view>
+    <view class="overview-item">
+      <view class="overview-value">{{masteredPoints}}</view>
+      <view class="overview-label">掌握知识点</view>
+    </view>
+  </view>
+
+  <!-- 学习曲线 -->
+  <view class="card">
+    <view class="card-title">📈 学习曲线</view>
+    <view class="chart-area">
+      <view class="chart-placeholder">📊 近7日问答数量图表</view>
+    </view>
+  </view>
+
+  <!-- 学科进度 -->
+  <view class="card">
+    <view class="card-title">📚 学科进度</view>
+    <view class="subject-progress-list">
+      <view class="progress-item" wx:for="{{subjectProgress}}" wx:key="subject">
+        <view class="progress-header">
+          <view class="progress-subject">{{item.subject}}</view>
+          <view class="progress-percent">{{item.percent}}%</view>
+        </view>
+        <view class="progress-bar-container">
+          <view class="progress-bar" style="width: {{item.percent}}%"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 知识点掌握 -->
+  <view class="card">
+    <view class="card-title">🎯 知识点掌握</view>
+    <view class="knowledge-grid">
+      <view class="knowledge-item {{item.level}}" wx:for="{{knowledgePoints}}" wx:key="name">
+        <view class="knowledge-name">{{item.name}}</view>
+        <view class="knowledge-status">{{item.status}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习建议 -->
+  <view class="card">
+    <view class="card-title">💡 学习建议</view>
+    <view class="suggestion-list">
+      <view class="suggestion-item" wx:for="{{suggestions}}" wx:key="*this">
+        <view class="suggestion-icon">📌</view>
+        <view class="suggestion-text">{{item}}</view>
+      </view>
+    </view>
+  </view>
+</view>

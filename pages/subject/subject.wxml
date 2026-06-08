@@ -1,0 +1,38 @@
+<!--pages/subject/subject.wxml - 学科专项页面-->
+<view class="container">
+  <view class="banner">
+    <view class="banner-title">{{subject}}</view>
+    <view class="banner-desc">专项训练 · 系统学习 · 逐个突破</view>
+  </view>
+
+  <!-- 知识点列表 -->
+  <view class="card">
+    <view class="card-title">知识点目录</view>
+    <view class="knowledge-list">
+      <view class="knowledge-item" wx:for="{{knowledgeList}}" wx:key="id" bindtap="selectKnowledge" data-id="{{item.id}}">
+        <view class="knowledge-icon">{{item.mastered ? '✅' : '📖'}}</view>
+        <view class="knowledge-info">
+          <view class="knowledge-name">{{item.name}}</view>
+          <view class="knowledge-desc">{{item.desc}}</view>
+        </view>
+        <view class="knowledge-count">{{item.questionCount}}题</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习统计 -->
+  <view class="stats-card">
+    <view class="stats-item">
+      <view class="stats-value">{{totalPoints}}</view>
+      <view class="stats-label">知识点总数</view>
+    </view>
+    <view class="stats-item">
+      <view class="stats-value">{{masteredPoints}}</view>
+      <view class="stats-label">已掌握</view>
+    </view>
+    <view class="stats-item">
+      <view class="stats-value">{{totalQuestions}}</view>
+      <view class="stats-label">练习题数</view>
+    </view>
+  </view>
+</view>

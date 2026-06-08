@@ -1,0 +1,193 @@
+/* pages/progress/progress.wxss */
+
+.container {
+  padding-bottom: 40rpx;
+  background-color: var(--bg-primary);
+}
+
+.banner {
+  background: linear-gradient(180deg, #1a1528 0%, var(--bg-primary) 100%);
+  padding: 40rpx;
+  text-align: center;
+  border-bottom: 1rpx solid var(--border-gold);
+}
+
+.banner-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: var(--gold-primary);
+  letter-spacing: 4rpx;
+  margin-bottom: 12rpx;
+}
+
+.banner-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.overview-card {
+  display: flex;
+  margin: 24rpx 20rpx;
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 12rpx;
+}
+
+.overview-item {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 0;
+  border-right: 1rpx solid var(--border-gold);
+}
+
+.overview-item:last-child {
+  border-right: none;
+}
+
+.overview-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--gold-primary);
+  margin-bottom: 8rpx;
+}
+
+.overview-label {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin: 0 20rpx 24rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: var(--gold-primary);
+  margin-bottom: 20rpx;
+  letter-spacing: 2rpx;
+}
+
+.chart-area {
+  height: 300rpx;
+  background: var(--bg-secondary);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-placeholder {
+  font-size: 26rpx;
+  color: var(--text-muted);
+}
+
+.subject-progress-list {
+
+}
+
+.progress-item {
+  margin-bottom: 16rpx;
+}
+
+.progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.progress-subject {
+  font-size: 26rpx;
+  color: var(--text-primary);
+}
+
+.progress-percent {
+  font-size: 26rpx;
+  color: var(--gold-primary);
+  font-weight: bold;
+}
+
+.progress-bar-container {
+  height: 16rpx;
+  background: var(--bg-secondary);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 4rpx;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+  border-radius: 4rpx;
+}
+
+.knowledge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.knowledge-item {
+  flex: 0 0 calc(50% - 6rpx);
+  background: var(--bg-secondary);
+  border: 1rpx solid var(--border-gold);
+  border-radius: 8rpx;
+  padding: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.knowledge-item.mastered {
+  border-color: var(--gold-primary);
+}
+
+.knowledge-item.learning {
+  border-color: var(--text-secondary);
+}
+
+.knowledge-name {
+  font-size: 26rpx;
+  color: var(--text-primary);
+}
+
+.knowledge-status {
+  font-size: 24rpx;
+}
+
+.knowledge-item.mastered .knowledge-status {
+  color: var(--gold-primary);
+}
+
+.knowledge-item.learning .knowledge-status {
+  color: var(--text-secondary);
+}
+
+.suggestion-list {
+
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12rpx 0;
+}
+
+.suggestion-icon {
+  color: var(--gold-primary);
+  margin-right: 12rpx;
+}
+
+.suggestion-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  flex: 1;
+}
