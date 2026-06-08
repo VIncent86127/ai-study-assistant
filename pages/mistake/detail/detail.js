@@ -6,7 +6,8 @@ const AI_MODELS = {
   gpt: { name: 'GPT-4', endpoint: '/api/ai/gpt' },
   claude: { name: 'Claude', endpoint: '/api/ai/claude' },
   glm: { name: '智谱GLM', endpoint: '/api/ai/glm' },
-  qwen: { name: '通义千问', endpoint: '/api/ai/qwen' }
+  qwen: { name: '通义千问', endpoint: '/api/ai/qwen' },
+  deepseek: { name: 'DeepSeek V4', endpoint: '/api/ai/deepseek' }
 }
 
 Page({
@@ -23,8 +24,8 @@ Page({
     
     // AI生成相关
     showGenerateModal: false,
-    currentModel: 'glm',  // 默认使用GLM
-    currentModelName: '智谱GLM',
+    currentModel: 'deepseek',  // 默认使用DeepSeek
+    currentModelName: 'DeepSeek V4',
     generating: false,
     generatedQuestion: '',
     generatedAnswer: ''

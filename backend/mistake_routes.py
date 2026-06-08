@@ -488,17 +488,95 @@ def generate_similar_question():
     """AI生成类似题目"""
     data = request.get_json()
     
-    model = data.get('model', 'glm')
+    model = data.get('model', 'deepseek')
     original_question = data.get('original_question', '')
     correct_answer = data.get('correct_answer', '')
     knowledge_points = data.get('knowledge_points', '')
     question_type = data.get('mistake_type', 'choice')
     difficulty = data.get('difficulty', 2)
     
-    # 根据不同模型生成题目
-    # 这里先返回模拟数据，实际需要调用对应AI API
+    # DeepSeek API配置
+    DEEPSEEK_API_KEY = 'sk-a1542b9174904634a3c566afa6f92aab'
+    DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'
     
-    # 模拟不同模型的响应
+    # 构建提示词
+    prompt = f"""请根据以下信息生成一道类似的英语题目：
+
+原题目：{original_question}
+正确答案：{correct_answer}
+知识点：{knowledge_points}
+题目类型：{question_type}
+难度：{difficulty}星
+
+要求：
+1. 生成的题目要考察相同或相关的知识点
+2. 题目难度要相近
+3. 题目类型要相同
+4. 请按以下格式返回：
+
+【题目】
+(题目内容)
+
+【答案】
+(参考答案及解析)
+"""
+
+    # 如果是DeepSeek模型，调用真实API
+    if model == 'deepseek':
+        try:
+            import requests
+            
+            response = requests.post(
+                DEEPSEEK_API_URL,
+                headers={
+                    'Authorization': f'Bearer {DEEPSEEK_API_KEY}',
+                    'Content-Type': 'application/json'
+                },
+                json={
+                    'model': 'deepseek-chat',
+                    'messages': [
+                        {'role': 'system', 'content': '你是一位经验丰富的初中英语教师，擅长根据学生的错题生成针对性的练习题。'},
+                        {'role': 'user', 'content': prompt}
+                    ],
+                    'temperature': 0.7,
+                    'max_tokens': 1000
+                    },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                content = result['choices'][0]['message']['content']
+                
+                # 解析返回内容
+                import re
+                question_match = re.search(r'【题目】(.+?)(?=【答案】|$)', content, re.DOTALL)
+                answer_match = re.search(r'【答案】(.+?)$', content, re.DOTALL)
+                
+                question = question_match.group(1).strip() if question_match else content
+                answer = answer_match.group(1).strip() if answer_match else '请参考AI生成的完整内容'
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'question': question,
+                        'answer': answer
+                    }
+                })
+            else:
+                # API调用失败，返回错误信息
+                return jsonify({
+                    'success': False,
+                    'error': f'API调用失败: {response.status_code}'
+                })
+                
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            })
+    
+    # 其他模型返回模拟数据
     mock_responses = {
         'gpt': {
             'question': f"[GPT生成] 根据知识点【{knowledge_points}】，请选择正确的答案：\nShe _____ to the cinema yesterday.\nA. go  B. goes  C. went  D. going",

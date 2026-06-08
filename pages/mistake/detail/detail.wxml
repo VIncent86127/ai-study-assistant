@@ -136,6 +136,7 @@
         <view class="model-btn {{currentModel === 'claude' ? 'active' : ''}}" bindtap="selectModel" data-model="claude">Claude</view>
         <view class="model-btn {{currentModel === 'glm' ? 'active' : ''}}" bindtap="selectModel" data-model="glm">GLM</view>
         <view class="model-btn {{currentModel === 'qwen' ? 'active' : ''}}" bindtap="selectModel" data-model="qwen">通义</view>
+        <view class="model-btn {{currentModel === 'deepseek' ? 'active' : ''}}" bindtap="selectModel" data-model="deepseek">DeepSeek</view>
       </view>
     </view>
     
