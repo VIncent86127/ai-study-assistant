@@ -762,3 +762,39 @@
   padding: 12rpx 24rpx;
   border-radius: 8rpx;
 }
+
+/* 知识点展开样式 */
+.knowledge-item {
+  margin-bottom: 15rpx;
+  border-radius: 8rpx;
+  background-color: #f9f9f9;
+  padding: 12rpx;
+}
+
+.knowledge-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.knowledge-arrow {
+  font-size: 20rpx;
+  color: #999;
+  margin-left: auto;
+  transition: transform 0.3s;
+}
+
+.knowledge-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.knowledge-explanation {
+  margin-top: 12rpx;
+  padding: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

@@ -60,9 +60,15 @@ Page({
         
         if (res.data.success) {
           const data = res.data.data
+          // 为每个知识点添加expanded属性
+          const knowledgePoints = (data.knowledge_points || []).map(kp => ({
+            ...kp,
+            expanded: false
+          }))
+          
           this.setData({
             mistake: data,
-            knowledgePoints: data.knowledge_points || [],
+            knowledgePoints: knowledgePoints,
             vocabulary: data.vocabulary || [],
             notes: data.notes || [],
             reviewHistory: data.review_history || []
@@ -78,6 +84,14 @@ Page({
     })
   },
 
+  // 切换知识点展开/折叠
+  toggleKnowledge(e) {
+    const index = e.currentTarget.dataset.index
+    const knowledgePoints = this.data.knowledgePoints
+    knowledgePoints[index].expanded = !knowledgePoints[index].expanded
+    this.setData({ knowledgePoints })
+  },
+  
   // 跳转到知识点详情
   goToKnowledge(e) {
     const item = e.currentTarget.dataset.item

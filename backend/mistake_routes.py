@@ -114,14 +114,19 @@ def get_mistake_detail(mistake_id):
     
     mistake = dict(row)
     
-    # 获取关联知识点
+    # 获取关联知识点（含详细讲解）
     cursor.execute('''
         SELECT mkl.knowledge_type, mkl.knowledge_id,
                CASE 
                    WHEN mkl.knowledge_type = 'phrase' THEN p.english || ' - ' || p.chinese
                    WHEN mkl.knowledge_type = 'pattern' THEN sp.pattern
                    WHEN mkl.knowledge_type = 'grammar' THEN gp.grammar_name
-               END as knowledge_content
+               END as knowledge_content,
+               CASE 
+                   WHEN mkl.knowledge_type = 'phrase' THEN p.example_sentence
+                   WHEN mkl.knowledge_type = 'pattern' THEN sp.explanation || COALESCE('例: ' || sp.example, '')
+                   WHEN mkl.knowledge_type = 'grammar' THEN gp.grammar_rule || COALESCE('\n' || gp.usage_notes, '') || COALESCE('\n例: ' || gp.examples, '')
+               END as explanation
         FROM mistake_knowledge_links mkl
         LEFT JOIN phrases p ON mkl.knowledge_type = 'phrase' AND mkl.knowledge_id = p.id
         LEFT JOIN sentence_patterns sp ON mkl.knowledge_type = 'pattern' AND mkl.knowledge_id = sp.id

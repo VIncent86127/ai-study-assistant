@@ -36,11 +36,17 @@
       </view>
     </view>
     <view class="knowledge-list" wx:if="{{knowledgePoints.length > 0}}">
-      <view class="knowledge-item" wx:for="{{knowledgePoints}}" wx:key="id" bindtap="goToKnowledge" data-item="{{item}}">
-        <view class="knowledge-tag {{item.knowledge_type}}">
-          {{item.knowledge_type === 'phrase' ? '短语' : item.knowledge_type === 'pattern' ? '句型' : '语法'}}
+      <view class="knowledge-item" wx:for="{{knowledgePoints}}" wx:key="knowledge_id">
+        <view class="knowledge-header" bindtap="toggleKnowledge" data-index="{{index}}">
+          <view class="knowledge-tag {{item.knowledge_type}}">
+            {{item.knowledge_type === 'phrase' ? '短语' : item.knowledge_type === 'pattern' ? '句型' : '语法'}}
+          </view>
+          <text class="knowledge-content">{{item.knowledge_content}}</text>
+          <text class="knowledge-arrow {{item.expanded ? 'expanded' : ''}}">▼</text>
         </view>
-        <text class="knowledge-content">{{item.knowledge_content}}</text>
+        <view class="knowledge-explanation" wx:if="{{item.expanded && item.explanation}}">
+          <text>{{item.explanation}}</text>
+        </view>
       </view>
     </view>
     <view class="empty-knowledge" wx:else>
