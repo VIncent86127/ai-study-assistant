@@ -325,24 +325,39 @@ def add_review(mistake_id):
         VALUES (?, ?, ?, ?)
     ''', (mistake_id, now, data.get('result'), data.get('review_notes')))
     
-    # 如果答对了3次，更新状态为已掌握
-    if data.get('result') == 'correct':
+    # 获取复习次数
+    cursor.execute('''
+        SELECT COUNT(*) FROM review_records WHERE mistake_id = ?
+    ''', (mistake_id,))
+    review_count = cursor.fetchone()[0]
+    
+    # 判断是否掌握（连续3次正确）
+    cursor.execute('''
+        SELECT result FROM review_records 
+        WHERE mistake_id = ? 
+        ORDER BY review_date DESC 
+        LIMIT 3
+    ''', (mistake_id,))
+    
+    recent_results = [row[0] for row in cursor.fetchall()]
+    mastered = len(recent_results) >= 3 and all(r == 'correct' for r in recent_results)
+    
+    if mastered:
         cursor.execute('''
-            SELECT COUNT(*) FROM review_records 
-            WHERE mistake_id = ? AND result = 'correct'
-        ''', (mistake_id,))
-        correct_count = cursor.fetchone()[0]
-        
-        if correct_count >= 3:
-            cursor.execute('''
-                UPDATE mistakes SET status = 'mastered', updated_at = ?
-                WHERE id = ?
-            ''', (now, mistake_id))
+            UPDATE mistakes SET status = 'mastered', updated_at = ?
+            WHERE id = ?
+        ''', (now, mistake_id))
     
     conn.commit()
     conn.close()
     
-    return jsonify({'success': True})
+    return jsonify({
+        'success': True,
+        'data': {
+            'review_count': review_count,
+            'mastered': mastered
+        }
+    })
 
 
 @mistake_bp.route('/api/mistakes/analyze', methods=['POST'])

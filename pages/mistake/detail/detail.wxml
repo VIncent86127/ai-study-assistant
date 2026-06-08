@@ -120,52 +120,123 @@
   </view>
 </view>
 
-<!-- AI生成类似题目弹窗 -->
+<!-- AI生成类似题目弹窗 - 做题模式 -->
 <view class="modal-mask" wx:if="{{showGenerateModal}}" bindtap="hideGenerateModal">
   <view class="generate-modal-content" catchtap="stopPropagation">
     <view class="modal-header">
-      <text>💡 AI生成类似题目</text>
+      <text>📝 练习类似题目</text>
       <text class="close-btn" bindtap="hideGenerateModal">×</text>
     </view>
     
-    <!-- AI模型选择 -->
-    <view class="model-selector">
-      <text class="model-label">选择AI模型：</text>
-      <view class="model-buttons">
-        <view class="model-btn {{currentModel === 'gpt' ? 'active' : ''}}" bindtap="selectModel" data-model="gpt">GPT</view>
-        <view class="model-btn {{currentModel === 'claude' ? 'active' : ''}}" bindtap="selectModel" data-model="claude">Claude</view>
-        <view class="model-btn {{currentModel === 'glm' ? 'active' : ''}}" bindtap="selectModel" data-model="glm">GLM</view>
-        <view class="model-btn {{currentModel === 'qwen' ? 'active' : ''}}" bindtap="selectModel" data-model="qwen">通义</view>
-        <view class="model-btn {{currentModel === 'deepseek' ? 'active' : ''}}" bindtap="selectModel" data-model="deepseek">DeepSeek</view>
-        <view class="model-btn {{currentModel === 'openmaic' ? 'active' : ''}}" bindtap="selectModel" data-model="openmaic">OpenMAIC</view>
+    <!-- 生成状态 -->
+    <view wx:if="{{generating}}" class="generating">
+      <text class="loading-icon">⏳</text>
+      <text>正在生成练习题...</text>
+    </view>
+    
+    <!-- 两道题目展示 -->
+    <view wx:else class="questions-container">
+      <!-- DeepSeek题目 -->
+      <view class="question-card" wx:if="{{deepseekQuestion}}">
+        <view class="question-header">
+          <text class="model-badge deepseek">DeepSeek V4</text>
+        </view>
+        <view class="question-content">{{deepseekQuestion}}</view>
+        <view class="answer-section" wx:if="{{showAnswer && currentDoingModel === 'deepseek'}}">
+          <text class="answer-label">正确答案：</text>
+          <text class="answer-text">{{deepseekAnswer}}</text>
+        </view>
+        <view class="action-buttons">
+          <button class="do-btn" bindtap="doQuestion" data-model="deepseek">开始做题</button>
+        </view>
+      </view>
+      
+      <!-- GLM题目 -->
+      <view class="question-card" wx:if="{{glmQuestion}}">
+        <view class="question-header">
+          <text class="model-badge glm">GLM</text>
+        </view>
+        <view class="question-content">{{glmQuestion}}</view>
+        <view class="answer-section" wx:if="{{showAnswer && currentDoingModel === 'glm'}}">
+          <text class="answer-label">正确答案：</text>
+          <text class="answer-text">{{glmAnswer}}</text>
+        </view>
+        <view class="action-buttons">
+          <button class="do-btn" bindtap="doQuestion" data-model="glm">开始做题</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 做题答题弹窗 -->
+<view class="modal-mask" wx:if="{{showDoQuestionModal}}" bindtap="hideDoQuestionModal">
+  <view class="do-question-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text>✍️ 做题练习</text>
+      <text class="close-btn" bindtap="hideDoQuestionModal">×</text>
+    </view>
+    
+    <!-- 题目 -->
+    <view class="current-question">
+      <view class="model-badge {{currentDoingModel}}">{{currentDoingModel === 'deepseek' ? 'DeepSeek V4' : 'GLM'}}</view>
+      <view class="question-text">{{currentQuestion}}</view>
+    </view>
+    
+    <!-- 用户输入答案 -->
+    <view class="answer-input-section">
+      <text class="input-label">你的答案：</text>
+      <textarea class="answer-input" 
+                 value="{{userAnswer}}" 
+                 bindinput="onUserAnswerInput"
+                 placeholder="请输入你的答案..." />
+    </view>
+    
+    <!-- 查看答案按钮 -->
+    <view class="check-answer-btn" wx:if="{{!showAnswer}}" bindtap="checkAnswer">
+      查看正确答案
+    </view>
+    
+    <!-- 答案展示 -->
+    <view class="correct-answer-section" wx:if="{{showAnswer}}">
+      <text class="correct-label">正确答案：</text>
+      <text class="correct-text">{{currentCorrectAnswer}}</text>
+    </view>
+    
+    <!-- 判断是否理解 -->
+    <view class="understand-section" wx:if="{{showAnswer}}">
+      <text class="understand-label">你觉得这道题你理解了吗？</text>
+      <view class="understand-buttons">
+        <view class="understand-btn yes" bindtap="markUnderstood">✓ 理解了</view>
+        <view class="understand-btn no" bindtap="markNotUnderstood">✗ 还没理解</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 复习记录弹窗 -->
+<view class="modal-mask" wx:if="{{showResultModal}}" bindtap="hideResultModal">
+  <view class="result-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text>📊 复习记录</text>
+    </view>
+    
+    <view class="result-content">
+      <view class="result-item">
+        <text class="result-label">复习时间：</text>
+        <text class="result-value">{{reviewTime}}</text>
+      </view>
+      <view class="result-item">
+        <text class="result-label">这是第</text>
+        <text class="result-value highlight">{{reviewCount}}</text>
+        <text class="result-label">次复习</text>
+      </view>
+      <view class="result-item">
+        <text class="result-label">同类题掌握情况：</text>
+        <text class="result-value {{mastered ? 'success' : 'warning'}}">{{mastered ? '已掌握' : '继续复习'}}</text>
       </view>
     </view>
     
-    <!-- 生成结果 -->
-    <view class="generate-result">
-      <view wx:if="{{generating}}" class="generating">
-        <text class="loading-icon">⏳</text>
-        <text>正在生成类似题目...</text>
-      </view>
-      <view wx:elif="{{generatedQuestion}}" class="generated-content">
-        <view class="generated-header">
-          <text class="model-badge">{{currentModelName}}</text>
-          <text class="generated-label">生成的类似题目：</text>
-        </view>
-        <view class="generated-question">{{generatedQuestion}}</view>
-        <view class="generated-answer">
-          <text class="answer-label">参考答案：</text>
-          <text>{{generatedAnswer}}</text>
-        </view>
-        <view class="generated-actions">
-          <button class="gen-btn" bindtap="regenerateQuestion">换一题</button>
-          <button class="gen-btn primary" bindtap="saveGeneratedQuestion">加入错题本</button>
-        </view>
-      </view>
-      <view wx:else class="generate-empty">
-        <text>点击下方按钮生成类似题目</text>
-        <button class="start-generate-btn" bindtap="startGenerate">开始生成</button>
-      </view>
-    </view>
+    <button class="close-result-btn" bindtap="hideResultModal">继续学习</button>
   </view>
 </view>
