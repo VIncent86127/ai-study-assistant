@@ -2,7 +2,7 @@
 App({
   globalData: {
     // 后端API地址
-    apiBase: 'http://localhost:5001',
+    apiBase: 'http://43.161.253.166:5001',
     
     // 用户信息
     userInfo: null,
