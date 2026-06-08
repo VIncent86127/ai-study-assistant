@@ -3,12 +3,8 @@ const app = getApp()
 
 // AI模型配置
 const AI_MODELS = {
-  gpt: { name: 'GPT-4', endpoint: '/api/ai/gpt' },
-  claude: { name: 'Claude', endpoint: '/api/ai/claude' },
-  glm: { name: '智谱GLM', endpoint: '/api/ai/glm' },
-  qwen: { name: '通义千问', endpoint: '/api/ai/qwen' },
   deepseek: { name: 'DeepSeek V4', endpoint: '/api/ai/deepseek' },
-  openmaic: { name: 'OpenMAIC', endpoint: '/api/ai/openmaic' }
+  glm: { name: 'GLM', endpoint: '/api/ai/glm' }
 }
 
 Page({
@@ -26,12 +22,11 @@ Page({
     // AI生成相关
     showGenerateModal: false,
     generating: false,
-    // DeepSeek生成的题目
     deepseekQuestion: '',
     deepseekAnswer: '',
-    // GLM生成的题目
     glmQuestion: '',
     glmAnswer: '',
+    
     // 做题状态
     showDoQuestionModal: false,
     currentDoingModel: '',
@@ -39,6 +34,7 @@ Page({
     currentCorrectAnswer: '',
     userAnswer: '',
     showAnswer: false,
+    
     // 结果状态
     showResultModal: false,
     reviewTime: '',
@@ -98,20 +94,16 @@ Page({
     })
   },
 
-  // 隐藏弹窗
   hideNoteModal() {
     this.setData({ showNoteModal: false })
   },
 
-  // 阻止冒泡
   stopPropagation() {},
 
-  // 输入备注
   onNewNoteInput(e) {
     this.setData({ newNoteContent: e.detail.value })
   },
 
-  // 提交备注
   submitNote() {
     const content = this.data.newNoteContent.trim()
     if (!content) {
@@ -151,7 +143,6 @@ Page({
     })
   },
 
-  // 提交复习记录
   submitReview(result) {
     wx.request({
       url: app.globalData.apiBase + `/api/mistakes/${this.data.mistakeId}/review`,
@@ -169,14 +160,12 @@ Page({
     })
   },
 
-  // 编辑错题
   editMistake() {
     wx.navigateTo({
       url: `/pages/mistake/add/add?id=${this.data.mistakeId}`
     })
   },
 
-  // 删除错题
   deleteMistake() {
     wx.showModal({
       title: '确认删除',
@@ -202,46 +191,28 @@ Page({
 
   // ========== AI生成类似题目功能 ==========
   
-  // 显示生成弹窗
   generateSimilarQuestion() {
     this.setData({ 
       showGenerateModal: true,
-      generatedQuestion: '',
-      generatedAnswer: '',
-      generating: false
+      generating: true,
+      deepseekQuestion: '',
+      deepseekAnswer: '',
+      glmQuestion: '',
+      glmAnswer: ''
     })
-  },
-  
-  // 隐藏生成弹窗
-  hideGenerateModal() {
-    this.setData({ showGenerateModal: false })
-  },
-  
-  // 选择AI模型
-  selectModel(e) {
-    const model = e.currentTarget.dataset.model
-    this.setData({
-      currentModel: model,
-      currentModelName: AI_MODELS[model].name,
-      generatedQuestion: '',
-      generatedAnswer: ''
-    })
-  },
-  
-  // 开始生成（同时调用DeepSeek和当前模型）
-  startGenerate() {
-    this.setData({ generating: true })
     
     // 同时请求两个模型
     this.generateWithModel('deepseek')
     this.generateWithModel('glm')
   },
   
+  hideGenerateModal() {
+    this.setData({ showGenerateModal: false })
+  },
+  
   // 调用AI生成题目
   generateWithModel(model) {
     const { mistake, knowledgePoints } = this.data
-    
-    // 构建知识点描述
     const knowledgeDesc = knowledgePoints.map(kp => kp.knowledge_content).join('、')
     
     wx.request({
@@ -262,17 +233,17 @@ Page({
               deepseekQuestion: res.data.data.question,
               deepseekAnswer: res.data.data.answer
             })
-          } else {
+          } else if (model === 'glm') {
             this.setData({
               glmQuestion: res.data.data.question,
               glmAnswer: res.data.data.answer
             })
           }
-        }
-        
-        // 检查是否都生成完毕
-        if (this.data.deepseekQuestion && this.data.glmQuestion) {
-          this.setData({ generating: false })
+          
+          // 检查是否都生成完毕
+          if (this.data.deepseekQuestion && this.data.glmQuestion) {
+            this.setData({ generating: false })
+          }
         }
       },
       fail: () => {
@@ -281,8 +252,6 @@ Page({
       }
     })
   },
-  
-  // ========== 做题流程 ==========
   
   // 开始做题
   doQuestion(e) {
@@ -301,34 +270,29 @@ Page({
     })
   },
   
-  // 隐藏做题弹窗
   hideDoQuestionModal() {
     this.setData({ showDoQuestionModal: false })
   },
   
-  // 用户输入答案
   onUserAnswerInput(e) {
     this.setData({ userAnswer: e.detail.value })
   },
   
-  // 查看答案
   checkAnswer() {
     this.setData({ showAnswer: true })
   },
   
-  // 标记已理解
   markUnderstood() {
     this.saveReviewRecord(true)
   },
   
-  // 标记未理解
   markNotUnderstood() {
     this.saveReviewRecord(false)
   },
   
   // 保存复习记录
   saveReviewRecord(understood) {
-    const { mistakeId, currentDoingModel } = this.data
+    const { mistakeId, currentDoingModel, userAnswer } = this.data
     
     wx.request({
       url: app.globalData.apiBase + `/api/mistakes/${mistakeId}/review`,
@@ -336,15 +300,13 @@ Page({
       data: {
         result: understood ? 'correct' : 'wrong',
         model: currentDoingModel,
-        review_notes: this.data.userAnswer
+        review_notes: userAnswer
       },
       success: (res) => {
         if (res.data.success) {
-          // 获取复习次数
           const reviewCount = res.data.data.review_count || 1
           const mastered = res.data.data.mastered || false
           
-          // 显示结果
           this.setData({
             showDoQuestionModal: false,
             showResultModal: true,
@@ -360,7 +322,6 @@ Page({
     })
   },
   
-  // 隐藏结果弹窗
   hideResultModal() {
     this.setData({ showResultModal: false })
   },
@@ -380,7 +341,6 @@ Page({
         wx.hideLoading()
         
         if (res.data.success) {
-          // 更新知识点
           const newKnowledge = res.data.data.knowledge_points
           this.setData({ knowledgePoints: newKnowledge })
           wx.showToast({ title: '分析完成', icon: 'success' })

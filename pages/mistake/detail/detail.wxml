@@ -10,7 +10,7 @@
     <view class="meta-row">
       <text class="meta-item" wx:if="{{mistake.grade_name}}">{{mistake.grade_name}}</text>
       <text class="meta-item" wx:if="{{mistake.chapter_name}}">{{mistake.chapter_name}}</text>
-      <text class="meta-item" wx:if="{{mistake.difficulty}}">{{mistake.difficulty}}</text>
+      <text class="meta-item" wx:if="{{mistake.difficulty}}">{{mistake.difficulty}}星</text>
     </view>
   </view>
 
@@ -120,7 +120,7 @@
   </view>
 </view>
 
-<!-- AI生成类似题目弹窗 - 做题模式 -->
+<!-- AI生成类似题目弹窗 -->
 <view class="modal-mask" wx:if="{{showGenerateModal}}" bindtap="hideGenerateModal">
   <view class="generate-modal-content" catchtap="stopPropagation">
     <view class="modal-header">
@@ -142,10 +142,6 @@
           <text class="model-badge deepseek">DeepSeek V4</text>
         </view>
         <view class="question-content">{{deepseekQuestion}}</view>
-        <view class="answer-section" wx:if="{{showAnswer && currentDoingModel === 'deepseek'}}">
-          <text class="answer-label">正确答案：</text>
-          <text class="answer-text">{{deepseekAnswer}}</text>
-        </view>
         <view class="action-buttons">
           <button class="do-btn" bindtap="doQuestion" data-model="deepseek">开始做题</button>
         </view>
@@ -157,10 +153,6 @@
           <text class="model-badge glm">GLM</text>
         </view>
         <view class="question-content">{{glmQuestion}}</view>
-        <view class="answer-section" wx:if="{{showAnswer && currentDoingModel === 'glm'}}">
-          <text class="answer-label">正确答案：</text>
-          <text class="answer-text">{{glmAnswer}}</text>
-        </view>
         <view class="action-buttons">
           <button class="do-btn" bindtap="doQuestion" data-model="glm">开始做题</button>
         </view>
@@ -205,7 +197,7 @@
     
     <!-- 判断是否理解 -->
     <view class="understand-section" wx:if="{{showAnswer}}">
-      <text class="understand-label">你觉得这道题你理解了吗？</text>
+      <text class="understand-label">你觉得这道题，理解了吗？</text>
       <view class="understand-buttons">
         <view class="understand-btn yes" bindtap="markUnderstood">✓ 理解了</view>
         <view class="understand-btn no" bindtap="markNotUnderstood">✗ 还没理解</view>
@@ -214,7 +206,7 @@
   </view>
 </view>
 
-<!-- 复习记录弹窗 -->
+<!-- 复习结果弹窗 -->
 <view class="modal-mask" wx:if="{{showResultModal}}" bindtap="hideResultModal">
   <view class="result-modal" catchtap="stopPropagation">
     <view class="modal-header">
