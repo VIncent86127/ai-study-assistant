@@ -9,8 +9,8 @@ Page({
     correctAnswer: '',
     noteContent: '',
     
-    // 学科固定为英语
-    subjects: ['英语'],
+    // 学科选择
+    subjects: ['英语', '数学'],
     subjectIndex: 0,
     subjectId: 3, // 英语的学科ID
     subjectName: '英语',
@@ -21,6 +21,9 @@ Page({
     gradeId: null,
     
     // 英语中考题型
+    englishQuestionTypes: ['听力理解', '单项选择', '完形填空', '阅读理解', '词汇运用', '语法填空', '任务型阅读', '书面表达', '翻译', '其他'],
+    // 数学中考题型
+    mathQuestionTypes: ['选择题', '填空题', '计算题', '证明题', '应用题', '综合题', '解答题', '探究题', '其他'],
     questionTypes: ['听力理解', '单项选择', '完形填空', '阅读理解', '词汇运用', '语法填空', '任务型阅读', '书面表达', '翻译', '其他'],
     typeIndex: -1,
     mistakeType: '',
@@ -100,18 +103,98 @@ Page({
     }).catch(err => {
       wx.hideLoading()
       console.error('OCR识别失败', err)
-      
-      // 模拟识别结果（开发阶段）
+      // 如果OCR失败，手动输入
       this.setData({
-        recognizedText: '示例题目内容（OCR识别失败）',
-        questionText: '示例题目内容（OCR识别失败）'
+        questionText: ''
       })
     })
+  },
+
+  // 选择学科
+  onSubjectChange(e) {
+    const index = parseInt(e.detail.value)
+    const subjectMap = {
+      0: { id: 3, name: '英语' },  // 英语的ID
+      1: { id: 2, name: '数学' }   // 数学的ID
+    }
+    
+    const subject = subjectMap[index]
+    const questionTypes = index === 0 ? this.data.englishQuestionTypes : this.data.mathQuestionTypes
+    
+    this.setData({
+      subjectIndex: index,
+      subjectId: subject.id,
+      subjectName: subject.name,
+      questionTypes: questionTypes,
+      typeIndex: -1,
+      mistakeType: ''
+    })
+    
+    // 重新分析题目
+    if (this.data.questionText) {
+      this.analyzeQuestion()
+    }
+  },
+
+  // 选择年级
+  onGradeChange(e) {
+    const index = parseInt(e.detail.value)
+    const gradeMap = { 0: 1, 1: 2, 2: 3, 3: 4 } // 初一、初二、初三、中考
+    
+    this.setData({
+      gradeIndex: index,
+      gradeId: gradeMap[index]
+    })
+  },
+
+  // 选择题型
+  onTypeChange(e) {
+    const index = parseInt(e.detail.value)
+    this.setData({
+      typeIndex: index,
+      mistakeType: this.data.questionTypes[index]
+    })
+  },
+
+  // 选择难度
+  onDifficultyChange(e) {
+    const index = parseInt(e.detail.value)
+    this.setData({
+      difficultyIndex: index,
+      difficultyStars: this.generateStars(this.data.difficultyLevels[index])
+    })
+  },
+
+  // 生成星级显示
+  generateStars(level) {
+    const fullStars = Math.floor(level)
+    const hasHalf = level % 1 !== 0
+    let stars = '★'.repeat(fullStars)
+    if (hasHalf) stars += '☆'
+    return stars
+  },
+
+  // 输入题目内容
+  onQuestionInput(e) {
+    this.setData({ questionText: e.detail.value })
+    this.checkCanSubmit()
+  },
+
+  // 输入答案
+  onAnswerInput(e) {
+    this.setData({ correctAnswer: e.detail.value })
+    this.checkCanSubmit()
+  },
+
+  // 输入备注
+  onNoteInput(e) {
+    this.setData({ noteContent: e.detail.value })
   },
 
   // 分析题目
   analyzeQuestion() {
     const { questionText, subjectId } = this.data
+    
     if (!questionText || !subjectId) return
     
     wx.request({
@@ -123,164 +206,48 @@ Page({
       },
       success: (res) => {
         if (res.data.success) {
+          const data = res.data.data
           this.setData({
-            knowledgePoints: res.data.data.knowledge_points,
-            vocabulary: res.data.data.vocabulary
+            knowledgePoints: data.knowledge_points || [],
+            vocabulary: data.vocabulary || []
           })
         }
       }
     })
-  },
-
-  // 编辑题目文本
-  editQuestionText() {
-    this.setData({
-      editingQuestion: true
-    })
-  },
-
-  onQuestionInput(e) {
-    this.setData({ questionText: e.detail.value })
-    this.checkCanSubmit()
-  },
-
-  onAnswerInput(e) {
-    this.setData({ correctAnswer: e.detail.value })
-    this.checkCanSubmit()
-  },
-
-  onNoteInput(e) {
-    this.setData({ noteContent: e.detail.value })
-  },
-
-  // 年级选择
-  onGradeChange(e) {
-    const index = parseInt(e.detail.value)
-    const gradeMap = {0: 1, 1: 2, 2: 3, 3: 4} // 初一=1, 初二=2, 初三=3, 中考=4
-    this.setData({
-      gradeIndex: index,
-      gradeId: gradeMap[index]
-    })
-  },
-
-  // 类型选择
-  onTypeChange(e) {
-    const index = parseInt(e.detail.value)
-    const typeMap = {
-      '听力理解': 'listening',
-      '单项选择': 'choice',
-      '完形填空': 'cloze',
-      '阅读理解': 'reading',
-      '词汇运用': 'vocabulary',
-      '语法填空': 'grammar_blank',
-      '任务型阅读': 'task_reading',
-      '书面表达': 'writing',
-      '翻译': 'translation',
-      '其他': 'other'
-    }
-    this.setData({
-      typeIndex: index,
-      mistakeType: typeMap[this.data.questionTypes[index]]
-    })
-  },
-
-  // 难度选择（星级）
-  onDifficultyChange(e) {
-    const index = parseInt(e.detail.value)
-    const level = this.data.difficultyLevels[index]
-    const stars = this.generateStars(level)
-    this.setData({
-      difficultyIndex: index,
-      difficultyStars: stars,
-      difficultyLevel: level
-    })
-  },
-  
-  // 生成星级显示
-  generateStars(level) {
-    const fullStars = Math.floor(level)
-    const hasHalf = level % 1 !== 0
-    let stars = '★'.repeat(fullStars)
-    if (hasHalf) stars += '⯨' // 半星符号
-    // 补齐空星
-    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0)
-    stars += '☆'.repeat(emptyStars)
-    return stars
   },
 
   // 检查是否可以提交
   checkCanSubmit() {
-    const { questionText, correctAnswer, subjectIndex } = this.data
-    this.setData({
-      canSubmit: questionText.length > 0 && subjectIndex >= 0
-    })
-  },
-
-  // 语音输入
-  startVoiceRecord() {
-    wx.showModal({
-      title: '语音输入',
-      content: '请开始说话，系统将自动识别您的语音并转换为文字',
-      success: (res) => {
-        if (res.confirm) {
-          // 开始录音
-          wx.startRecord({
-            success: (res) => {
-              const tempFilePath = res.tempFilePath
-              // 语音识别（需要调用语音识别API）
-              this.recognizeVoice(tempFilePath)
-            },
-            fail: (err) => {
-              wx.showToast({ title: '录音失败', icon: 'none' })
-            }
-          })
-        }
-      }
-    })
-  },
-
-  // 语音识别
-  recognizeVoice(filePath) {
-    wx.showLoading({ title: '识别中...' })
-    
-    // 调用语音识别API
-    // 实际项目中需要使用腾讯云或百度语音识别服务
-    setTimeout(() => {
-      wx.hideLoading()
-      const mockText = '这是语音识别的示例文本（实际需要调用API）'
-      
-      this.setData({
-        noteContent: this.data.noteContent + '\n' + mockText
-      })
-      
-      wx.showToast({ title: '识别成功', icon: 'success' })
-    }, 1000)
+    const { questionText, correctAnswer, subjectId, gradeId, mistakeType } = this.data
+    const canSubmit = questionText && correctAnswer && subjectId && gradeId && mistakeType
+    this.setData({ canSubmit })
   },
 
   // 提交错题
   submitMistake() {
-    if (!this.data.canSubmit) return
-    
-    const data = {
-      user_id: app.globalData.userId || 'default',
-      subject_id: this.data.subjectId,
-      grade_id: this.data.gradeId,
-      question_text: this.data.questionText,
-      correct_answer: this.data.correctAnswer,
-      mistake_type: this.data.mistakeType || 'unknown',
-      difficulty: this.data.difficultyLevels[this.data.difficultyIndex], // 星级数值
-      knowledge_points: this.data.knowledgePoints.map(kp => ({
-        type: kp.type,
-        id: kp.id
-      })),
-      vocabulary: this.data.vocabulary,
-      notes: this.data.noteContent ? [{
-        type: 'text',
-        content: this.data.noteContent
-      }] : []
+    if (!this.data.canSubmit) {
+      wx.showToast({ title: '请填写完整信息', icon: 'none' })
+      return
     }
     
-    wx.showLoading({ title: '保存中...' })
+    const { questionText, correctAnswer, subjectId, gradeId, mistakeType, 
+            difficultyLevels, difficultyIndex, noteContent, imagePath } = this.data
+    
+    wx.showLoading({ title: '提交中...' })
+    
+    const data = {
+      user_id: app.globalData.userId || 'test_user',
+      subject_id: subjectId,
+      grade_id: gradeId,
+      question_text: questionText,
+      correct_answer: correctAnswer,
+      mistake_type: mistakeType,
+      difficulty: difficultyLevels[difficultyIndex]
+    }
+    
+    if (noteContent) {
+      data.notes = [{ type: 'text', content: noteContent }]
+    }
     
     wx.request({
       url: app.globalData.apiBase + '/api/mistakes',
@@ -290,16 +257,16 @@ Page({
         wx.hideLoading()
         
         if (res.data.success) {
-          wx.showToast({ title: '保存成功', icon: 'success' })
+          wx.showToast({ title: '添加成功', icon: 'success' })
           
           setTimeout(() => {
             wx.navigateBack()
           }, 1500)
         } else {
-          wx.showToast({ title: '保存失败', icon: 'none' })
+          wx.showToast({ title: res.data.error || '添加失败', icon: 'none' })
         }
       },
-      fail: (err) => {
+      fail: () => {
         wx.hideLoading()
         wx.showToast({ title: '网络错误', icon: 'none' })
       }

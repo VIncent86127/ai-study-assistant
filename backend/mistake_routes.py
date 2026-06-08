@@ -410,7 +410,6 @@ def analyze_question():
             ''')
             
             for row in cursor.fetchall():
-                # 简单匹配：如果句型关键词出现在题目中
                 keywords = re.findall(r'[A-Za-z]+', row['pattern'])
                 if any(kw.lower() in question_text.lower() for kw in keywords if len(kw) > 3):
                     result['knowledge_points'].append({
@@ -420,7 +419,7 @@ def analyze_question():
                         'chapter': row['chapter_name']
                     })
             
-            # 提取生僻词（简单实现：提取较长英文单词）
+            # 提取生僻词
             english_words = re.findall(r'\b[a-zA-Z]{6,}\b', question_text)
             common_words = {'because', 'should', 'would', 'could', 'during', 'before', 
                           'after', 'between', 'through', 'although', 'however'}
@@ -429,9 +428,109 @@ def analyze_question():
                 if word.lower() not in common_words:
                     result['vocabulary'].append({
                         'word': word,
-                        'meaning': '',  # 需要后续填充
+                        'meaning': '',
                         'phonetic': ''
                     })
+        
+        elif subject and subject['name'] == '数学':
+            # 匹配数学概念
+            cursor.execute('''
+                SELECT mc.id, mc.concept_name, mc.definition, mch.chapter_name, mch.grade, mch.semester
+                FROM math_concepts mc
+                JOIN math_chapters mch ON mc.chapter_id = mch.id
+            ''')
+            
+            for row in cursor.fetchall():
+                # 匹配概念名称
+                if row['concept_name'] in question_text:
+                    result['knowledge_points'].append({
+                        'type': 'concept',
+                        'id': row['id'],
+                        'content': row['concept_name'],
+                        'chapter': f"{row['grade']}{row['semester']} - {row['chapter_name']}",
+                        'explanation': row['definition']
+                    })
+            
+            
+            # 匹配定理/法则
+            cursor.execute('''
+                SELECT mt.id, mt.theorem_name, mt.content, mch.chapter_name, mch.grade, mch.semester
+                FROM math_theorems mt
+                JOIN math_chapters mch ON mt.chapter_id = mch.id
+            ''')
+            
+            for row in cursor.fetchall():
+                if row['theorem_name'] in question_text:
+                    result['knowledge_points'].append({
+                        'type': 'theorem',
+                        'id': row['id'],
+                        'content': row['theorem_name'],
+                        'chapter': f"{row['grade']}{row['semester']} - {row['chapter_name']}",
+                        'explanation': row['content']
+                    })
+            
+            
+            # 根据关键词匹配题型
+            cursor.execute('''
+                SELECT mqt.id, mqt.type_name, mqt.description, mch.chapter_name, mch.grade, mch.semester
+                FROM math_question_types mqt
+                JOIN math_chapters mch ON mqt.chapter_id = mch.id
+            ''')
+            
+            keywords_map = {
+                '计算': ['计算', '求值', '等于', '运算'],
+                '证明': ['证明', '求证'],
+                '应用': ['应用', '实际', '问题', '求多少'],
+                '方程': ['方程', '解方程', '求x'],
+                '函数': ['函数', 'y=', '图象', '抛物线'],
+                '几何': ['三角形', '圆', '四边形', '角'],
+                '概率': ['概率', '随机', '可能性'],
+                '统计': ['平均', '中位数', '众数', '方差']
+            }
+            
+            for row in cursor.fetchall():
+                type_keywords = keywords_map.get(row['type_name'], [])
+                if any(kw in question_text for kw in type_keywords):
+                    result['knowledge_points'].append({
+                        'type': 'question_type',
+                        'id': row['id'],
+                        'content': row['type_name'],
+                        'chapter': f"{row['grade']}{row['semester']} - {row['chapter_name']}",
+                        'explanation': row['description']
+                    })
+            
+            
+            # 如果没有匹配到知识点，根据章节关键词推断
+            if not result['knowledge_points']:
+                # 检测章节关键词
+                chapter_keywords = {
+                    '有理数': ['有理数', '正数', '负数', '绝对值', '加减乘除'],
+                    '方程': ['方程', '解', '未知数', 'x', 'y'],
+                    '函数': ['函数', 'y=', 'x=', '图象', '坐标'],
+                    '几何': ['三角形', '角', '边', '平行', '垂直', '圆'],
+                    '统计': ['平均数', '中位数', '众数', '概率']
+                }
+                
+                for chapter, keywords in chapter_keywords.items():
+                    if any(kw in question_text for kw in keywords):
+                        # 查找相关概念
+                        cursor.execute('''
+                            SELECT mc.id, mc.concept_name, mc.definition, mch.chapter_name, mch.grade, mch.semester
+                            FROM math_concepts mc
+                            JOIN math_chapters mch ON mc.chapter_id = mch.id
+                            WHERE mch.chapter_name LIKE ?
+                            LIMIT 3
+                        ''', (f'%{chapter}%',))
+                        
+                        for row in cursor.fetchall():
+                            result['knowledge_points'].append({
+                                'type': 'concept',
+                                'id': row['id'],
+                                'content': row['concept_name'],
+                                'chapter': f"{row['grade']}{row['semester']} - {row['chapter_name']}",
+                                'explanation': row['definition']
+                            })
+                        break
     
     conn.close()
     
