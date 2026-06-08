@@ -1,6 +1,14 @@
 // pages/mistake/detail/detail.js
 const app = getApp()
 
+// AI模型配置
+const AI_MODELS = {
+  gpt: { name: 'GPT-4', endpoint: '/api/ai/gpt' },
+  claude: { name: 'Claude', endpoint: '/api/ai/claude' },
+  glm: { name: '智谱GLM', endpoint: '/api/ai/glm' },
+  qwen: { name: '通义千问', endpoint: '/api/ai/qwen' }
+}
+
 Page({
   data: {
     mistakeId: null,
@@ -11,7 +19,15 @@ Page({
     reviewHistory: [],
     
     showNoteModal: false,
-    newNoteContent: ''
+    newNoteContent: '',
+    
+    // AI生成相关
+    showGenerateModal: false,
+    currentModel: 'glm',  // 默认使用GLM
+    currentModelName: '智谱GLM',
+    generating: false,
+    generatedQuestion: '',
+    generatedAnswer: ''
   },
 
   onLoad(options) {
@@ -164,6 +180,141 @@ Page({
             }
           })
         }
+      }
+    })
+  },
+
+  // ========== AI生成类似题目功能 ==========
+  
+  // 显示生成弹窗
+  generateSimilarQuestion() {
+    this.setData({ 
+      showGenerateModal: true,
+      generatedQuestion: '',
+      generatedAnswer: '',
+      generating: false
+    })
+  },
+  
+  // 隐藏生成弹窗
+  hideGenerateModal() {
+    this.setData({ showGenerateModal: false })
+  },
+  
+  // 选择AI模型
+  selectModel(e) {
+    const model = e.currentTarget.dataset.model
+    this.setData({
+      currentModel: model,
+      currentModelName: AI_MODELS[model].name,
+      generatedQuestion: '',
+      generatedAnswer: ''
+    })
+  },
+  
+  // 开始生成
+  startGenerate() {
+    this.generateQuestion()
+  },
+  
+  // 重新生成
+  regenerateQuestion() {
+    this.generateQuestion()
+  },
+  
+  // 调用AI生成题目
+  generateQuestion() {
+    const { mistake, knowledgePoints, currentModel } = this.data
+    
+    this.setData({ generating: true })
+    
+    // 构建知识点描述
+    const knowledgeDesc = knowledgePoints.map(kp => kp.knowledge_content).join('、')
+    
+    // 调用后端API生成题目
+    wx.request({
+      url: app.globalData.apiBase + '/api/ai/generate-question',
+      method: 'POST',
+      data: {
+        model: currentModel,
+        original_question: mistake.question_text,
+        correct_answer: mistake.correct_answer,
+        knowledge_points: knowledgeDesc,
+        question_type: mistake.mistake_type,
+        difficulty: mistake.difficulty
+      },
+      success: (res) => {
+        this.setData({ generating: false })
+        
+        if (res.data.success) {
+          this.setData({
+            generatedQuestion: res.data.data.question,
+            generatedAnswer: res.data.data.answer
+          })
+        } else {
+          wx.showToast({ title: '生成失败，请重试', icon: 'none' })
+        }
+      },
+      fail: () => {
+        this.setData({ generating: false })
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      }
+    })
+  },
+  
+  // 保存生成的题目到错题本
+  saveGeneratedQuestion() {
+    const { generatedQuestion, generatedAnswer, mistake } = this.data
+    
+    wx.request({
+      url: app.globalData.apiBase + '/api/mistakes',
+      method: 'POST',
+      data: {
+        user_id: app.globalData.userId || 'test_user',
+        subject_id: mistake.subject_id,
+        grade_id: mistake.grade_id,
+        question_text: generatedQuestion,
+        correct_answer: generatedAnswer,
+        mistake_type: mistake.mistake_type,
+        difficulty: mistake.difficulty,
+        notes: [{
+          type: 'text',
+          content: 'AI生成的类似题目'
+        }]
+      },
+      success: (res) => {
+        if (res.data.success) {
+          wx.showToast({ title: '已加入错题本', icon: 'success' })
+          this.hideGenerateModal()
+        }
+      }
+    })
+  },
+  
+  // 重新分析知识点
+  analyzeAgain() {
+    wx.showLoading({ title: '分析中...' })
+    
+    wx.request({
+      url: app.globalData.apiBase + '/api/mistakes/analyze',
+      method: 'POST',
+      data: {
+        question_text: this.data.mistake.question_text,
+        subject_id: this.data.mistake.subject_id
+      },
+      success: (res) => {
+        wx.hideLoading()
+        
+        if (res.data.success) {
+          // 更新知识点
+          const newKnowledge = res.data.data.knowledge_points
+          this.setData({ knowledgePoints: newKnowledge })
+          wx.showToast({ title: '分析完成', icon: 'success' })
+        }
+      },
+      fail: () => {
+        wx.hideLoading()
+        wx.showToast({ title: '分析失败', icon: 'none' })
       }
     })
   }

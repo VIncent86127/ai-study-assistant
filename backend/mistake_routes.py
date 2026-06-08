@@ -481,3 +481,46 @@ def get_statistics():
             'weekly_reviews': weekly_reviews
         }
     })
+
+
+@mistake_bp.route('/api/ai/generate-question', methods=['POST'])
+def generate_similar_question():
+    """AI生成类似题目"""
+    data = request.get_json()
+    
+    model = data.get('model', 'glm')
+    original_question = data.get('original_question', '')
+    correct_answer = data.get('correct_answer', '')
+    knowledge_points = data.get('knowledge_points', '')
+    question_type = data.get('mistake_type', 'choice')
+    difficulty = data.get('difficulty', 2)
+    
+    # 根据不同模型生成题目
+    # 这里先返回模拟数据，实际需要调用对应AI API
+    
+    # 模拟不同模型的响应
+    mock_responses = {
+        'gpt': {
+            'question': f"[GPT生成] 根据知识点【{knowledge_points}】，请选择正确的答案：\nShe _____ to the cinema yesterday.\nA. go  B. goes  C. went  D. going",
+            'answer': 'C. went（一般过去时，用动词过去式）'
+        },
+        'claude': {
+            'question': f"[Claude生成] 基于【{knowledge_points}】的练习题：\n用括号内动词的正确形式填空：\nThey _____(watch) a movie last night.",
+            'answer': 'watched（last night表示过去，用一般过去时）'
+        },
+        'glm': {
+            'question': f"[GLM生成] 请根据【{knowledge_points}】完成下列题目：\n单项选择：\nI _____ breakfast at 7:00 this morning.\nA. have  B. has  C. had  D. having",
+            'answer': 'C. had（this morning表示今天早上，是过去的时间，用一般过去时）'
+        },
+        'qwen': {
+            'question': f"[通义千问生成] 针对知识点【{knowledge_points}】的练习：\n翻译句子：\n他昨天去了公园。",
+            'answer': 'He went to the park yesterday.（yesterday是过去时间，go变成went）'
+        }
+    }
+    
+    response = mock_responses.get(model, mock_responses['glm'])
+    
+    return jsonify({
+        'success': True,
+        'data': response
+    })
